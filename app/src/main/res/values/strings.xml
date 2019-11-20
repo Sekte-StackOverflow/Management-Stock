@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Management-Stock-App</string>
+    <string name="title">Aplikasi Manajemen Stock Barang</string>
 </resources>
