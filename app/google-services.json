@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "325548454389",
+    "firebase_url": "https://managementstock-7c204.firebaseio.com",
+    "project_id": "managementstock-7c204",
+    "storage_bucket": "managementstock-7c204.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325548454389:android:80f37d8bf85482a1ac70bc",
+        "android_client_info": {
+          "package_name": "com.example.management_stock_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "325548454389-j53dr0imtnvunu7vjs0ev184n347btq8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBl5vdrIndo9e3A5i4T0cktJ7rw-PORqx4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "325548454389-j53dr0imtnvunu7vjs0ev184n347btq8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
