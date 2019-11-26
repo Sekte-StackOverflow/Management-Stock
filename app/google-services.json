@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "325548454389-99toj12r7c4u7g4s1rh61alt78cat8m5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.management_stock_app",
+            "certificate_hash": "e75eb928430ad4d4c76e1cbb162ff8ff43f88490"
+          }
+        },
+        {
           "client_id": "325548454389-j53dr0imtnvunu7vjs0ev184n347btq8.apps.googleusercontent.com",
           "client_type": 3
         }
