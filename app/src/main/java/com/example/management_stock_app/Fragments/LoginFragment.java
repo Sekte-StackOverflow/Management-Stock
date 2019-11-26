@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -52,6 +53,7 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         emailField = view.findViewById(R.id.input_username);
         passwordField = view.findViewById(R.id.input_password);
         btnLogin = view.findViewById(R.id.btn_login);
