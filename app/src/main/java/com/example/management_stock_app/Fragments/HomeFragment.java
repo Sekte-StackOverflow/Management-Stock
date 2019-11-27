@@ -4,13 +4,19 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 
 import com.example.management_stock_app.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,8 +24,11 @@ import com.example.management_stock_app.R;
  * {@link HomeFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class HomeFragment extends Fragment {
-
+public class HomeFragment extends Fragment implements View.OnClickListener{
+    Button product, stock, transaction;
+    private Boolean isFabOpen = false;
+    private FloatingActionButton fab,fab1,fab2;
+    private Animation fab_open,fab_close,rotate_forward,rotate_backward;
     private OnFragmentInteractionListener mListener;
 
     public HomeFragment() {
@@ -31,8 +40,90 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+
+        fab = view.findViewById(R.id.fab_menu);
+        fab1 = view.findViewById(R.id.fab_in);
+        fab2 = view.findViewById(R.id.fab_out);
+        fab_open = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getActivity(),R.anim.fab_close);
+        rotate_forward = AnimationUtils.loadAnimation(getActivity(),R.anim.rotate_forward);
+        rotate_backward = AnimationUtils.loadAnimation(getActivity(),R.anim.rotate_backward);
+        fab.setOnClickListener(this);
+        fab1.setOnClickListener(this);
+        fab2.setOnClickListener(this);
+
+        product = view.findViewById(R.id.Productbutton);
+        product.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.buttonProduct();
+            }
+        });
+
+        stock = view.findViewById(R.id.Stockbutton);
+        stock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.buttonStocks();
+            }
+        });
+
+        transaction = view.findViewById(R.id.Transactionbutton);
+        transaction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.buttonTransaction();
+            }
+        });
+
+        return view;
     }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        switch (id){
+            case R.id.fab_menu:
+
+                animateFAB();
+                break;
+            case R.id.fab_in:
+                mListener.buttonInput();
+                Log.d("tes", "Fab in");
+                break;
+            case R.id.fab_out:
+                mListener.buttongOutput();
+                Log.d("tes", "Fab out");
+                break;
+        }
+    }
+    public void animateFAB(){
+
+        if(isFabOpen){
+
+            fab.startAnimation(rotate_backward);
+            fab1.startAnimation(fab_close);
+            fab2.startAnimation(fab_close);
+            fab1.setClickable(false);
+            fab2.setClickable(false);
+            isFabOpen = false;
+            Log.d("tes", "close");
+
+        } else {
+
+            fab.startAnimation(rotate_forward);
+            fab1.startAnimation(fab_open);
+            fab2.startAnimation(fab_open);
+            fab1.setClickable(true);
+            fab2.setClickable(true);
+            isFabOpen = true;
+            Log.d("tes","open");
+
+        }
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -71,5 +162,11 @@ public class HomeFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+        void buttonProduct();
+        void buttonInput();
+        void buttongOutput();
+        void buttonStocks();
+        void buttonTransaction();
+
     }
 }
