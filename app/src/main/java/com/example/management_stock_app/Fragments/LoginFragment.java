@@ -1,5 +1,6 @@
 package com.example.management_stock_app.Fragments;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -13,20 +14,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.management_stock_app.Models.Admin;
+import com.example.management_stock_app.Models.User;
 import com.example.management_stock_app.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,6 +44,7 @@ public class LoginFragment extends Fragment {
     private FirebaseAuth fireAuth;
     private FirebaseUser user;
     private FirebaseFirestore mfFirestore;
+    private ProgressBar loadingBar;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -56,11 +58,13 @@ public class LoginFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         emailField = view.findViewById(R.id.input_username);
         passwordField = view.findViewById(R.id.input_password);
+        loadingBar = view.findViewById(R.id.progressBar3);
         btnLogin = view.findViewById(R.id.btn_login);
         btnReg = view.findViewById(R.id.btn_register);
         fireAuth = FirebaseAuth.getInstance();
-        user = fireAuth.getCurrentUser();
         mfFirestore = FirebaseFirestore.getInstance();
+
+        loadingBar.setVisibility(View.GONE);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,30 +98,63 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    private void createNewUser(String email, String pass) {
+    private void buttonGone() {
+        btnReg.setVisibility(View.GONE);
+        btnLogin.setVisibility(View.GONE);
+        loadingBar.setVisibility(View.VISIBLE);
+    }
+    private void buttonVisible() {
+        btnReg.setVisibility(View.VISIBLE);
+        btnLogin.setVisibility(View.VISIBLE);
+        loadingBar.setVisibility(View.GONE);
+    }
+
+    private void createNewUser(final String email, String pass) {
+        buttonGone();
         fireAuth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 Log.d(TAG, "createUser:onComplete:" + task.isSuccessful());
                 if (task.isSuccessful()) {
-                    Toast.makeText(getActivity(), "Success Register", Toast.LENGTH_SHORT).show();
+                    writeNewUser(email);
                 } else {
+                    buttonVisible();
                     Toast.makeText(getActivity(), "Failed Register", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
+    private void writeNewUser(String email) {
+        String username = usernameFromEmail(email);
+        User user = new User(username, email);
+        mfFirestore.collection("Users").add(user)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if (task.isSuccessful()) {
+                            buttonVisible();
+                            Toast.makeText(getActivity(), "Success create new user", Toast.LENGTH_SHORT).show();
+                        } else {
+                            buttonVisible();
+                            Toast.makeText(getActivity(), "Failed create new user", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
 
     private void signIn(final String email, String pass) {
+        buttonGone();
         fireAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 Log.d(TAG, "LoginUser:onComplete:" + task.isSuccessful());
                 if (task.isSuccessful()) {
-                    user = task.getResult().getUser();
-                    String username = usernameFromEmail(user.getEmail());
-                    Toast.makeText(getActivity(), "Success as:" + username, Toast.LENGTH_SHORT).show();
+                    if (task.getResult().getUser() != null) {
+                        user =  task.getResult().getUser();
+                        mListener.onLoginSuccess();
+                    }
                 } else {
+                    buttonVisible();
                     Toast.makeText(getActivity(), "Failed Login", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -125,9 +162,14 @@ public class LoginFragment extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     /**
@@ -142,6 +184,6 @@ public class LoginFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onLoginSuccess();
     }
 }

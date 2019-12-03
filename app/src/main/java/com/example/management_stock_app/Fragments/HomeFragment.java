@@ -31,6 +31,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     private Animation fab_open,fab_close,rotate_forward,rotate_backward;
     private OnFragmentInteractionListener mListener;
 
+    // Firebase
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -94,7 +96,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
                 Log.d("tes", "Fab in");
                 break;
             case R.id.fab_out:
-                mListener.buttongOutput();
+                mListener.buttonOutput();
                 Log.d("tes", "Fab out");
                 break;
         }
@@ -164,7 +166,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         void onFragmentInteraction(Uri uri);
         void buttonProduct();
         void buttonInput();
-        void buttongOutput();
+        void buttonOutput();
         void buttonStocks();
         void buttonTransaction();
 
