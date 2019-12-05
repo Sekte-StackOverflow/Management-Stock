@@ -4,15 +4,22 @@ public class Barang {
     private String code;
     private String nama;
     private int stock;
+    private int harga;
     private String gambar;
 
     public Barang() {
     }
 
-    public Barang(String code , String nama, int stock) {
+    public Barang(String code, String nama, int stock, String gambar, int harga) {
+        this.code = code;
         this.nama = nama;
         this.stock = stock;
-        this.code = code;
+        this.gambar = gambar;
+        this.harga = harga;
+    }
+
+    public int getHarga() {
+        return harga;
     }
 
     public String getCode() {

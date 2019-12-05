@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Data {
-    private User user = new User();
+    private String name;
+    private String email;
     private List<Barang> barangList = new ArrayList<>();
     private List<Transaksi> transaksiList = new ArrayList<>();
     private String tanggal;
@@ -12,19 +13,28 @@ public class Data {
     public Data() {
     }
 
-    public Data(User user, List<Barang> barangList, List<Transaksi> transaksiList, String tanggal) {
-        this.user = user;
+    public Data(String name, String email, List<Barang> barangList, List<Transaksi> transaksiList, String tanggal) {
+        this.name = name;
+        this.email = email;
         this.barangList = barangList;
         this.transaksiList = transaksiList;
         this.tanggal = tanggal;
     }
 
-    public User getUser() {
-        return user;
+    public String getName() {
+        return name;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public List<Barang> getBarangList() {

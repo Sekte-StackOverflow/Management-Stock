@@ -16,8 +16,9 @@ import com.example.management_stock_app.Fragments.ProductsFragment;
 import com.example.management_stock_app.Fragments.StocksFragment;
 import com.example.management_stock_app.Fragments.TransactionFragment;
 
+import java.lang.reflect.Array;
+
 public class MainActivity extends AppCompatActivity implements
-        LoginFragment.OnFragmentInteractionListener,
         HomeFragment.OnFragmentInteractionListener,
         ProductsFragment.OnFragmentInteractionListener,
         ProductInFragment.OnFragmentInteractionListener,
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements
 
         setContentView(R.layout.activity_main);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_container, new LoginFragment())
+                .replace(R.id.main_container, new ProductsFragment())
                 .commit();
     }
 
@@ -64,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements
                 .addToBackStack(null)
                 .commit();
     }
-
     @Override
     public void buttonStocks() {
 
@@ -73,12 +73,5 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void buttonTransaction() {
 
-    }
-
-    @Override
-    public void onLoginSuccess() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_container, new HomeFragment())
-                .commit();
     }
 }

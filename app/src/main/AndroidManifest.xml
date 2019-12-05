@@ -3,7 +3,6 @@
     package="com.example.management_stock_app">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/new_logo_launcher"
@@ -20,7 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".Actitvity.LoginActivity"/>
+        <activity android:name=".MainActivity" />
     </application>
-
 </manifest>
