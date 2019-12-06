@@ -79,10 +79,8 @@ public class LoginFragment extends Fragment {
         btnReg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = emailField.getText().toString();
-                String pass = passwordField.getText().toString();
-                if (!email.equals("") && !pass.equals("")) {
-                    createNewUser(email, pass);
+                if (mListener != null) {
+                    mListener.registrationPhase();
                 }
             }
         });
@@ -107,39 +105,6 @@ public class LoginFragment extends Fragment {
         btnReg.setVisibility(View.VISIBLE);
         btnLogin.setVisibility(View.VISIBLE);
         loadingBar.setVisibility(View.GONE);
-    }
-
-    private void createNewUser(final String email, String pass) {
-        buttonGone();
-        fireAuth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                Log.d(TAG, "createUser:onComplete:" + task.isSuccessful());
-                if (task.isSuccessful()) {
-                    writeNewUser(email);
-                } else {
-                    buttonVisible();
-                    Toast.makeText(getActivity(), "Failed Register", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-    private void writeNewUser(String email) {
-        String username = usernameFromEmail(email);
-        User user = new User(username, email);
-        mfFirestore.collection("Users").add(user)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if (task.isSuccessful()) {
-                            buttonVisible();
-                            Toast.makeText(getActivity(), "Success create new user", Toast.LENGTH_SHORT).show();
-                        } else {
-                            buttonVisible();
-                            Toast.makeText(getActivity(), "Failed create new user", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
     }
 
     private void signIn(final String email, String pass) {
@@ -185,5 +150,6 @@ public class LoginFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onLoginSuccess();
+        void registrationPhase();
     }
 }

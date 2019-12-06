@@ -20,34 +20,24 @@ import android.widget.Toast;
 
 import com.example.management_stock_app.Adapters.ProductAdapter;
 import com.example.management_stock_app.Models.Barang;
-import com.example.management_stock_app.Models.Data;
 import com.example.management_stock_app.Models.User;
 import com.example.management_stock_app.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.firestore.DocumentReference;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.Source;
-import com.google.firebase.firestore.model.Document;
-import com.google.firebase.firestore.model.DocumentCollections;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -91,7 +81,8 @@ public class ProductsFragment extends Fragment {
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String uri = mListener.imageFromGallery();
+                Toast.makeText(getContext(), uri, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -110,25 +101,29 @@ public class ProductsFragment extends Fragment {
                                 testView.setText("User Account: "+userData.getName());
                                 try {
                                     JSONArray jsonArray = new JSONArray(user.get("Barang").toString());
-                                    for (int i = 0; i < jsonArray.length(); i++) {
-                                        String jString = jsonArray.get(i).toString();
-                                        JsonParser parser = new JsonParser();
-                                        JsonObject object = parser.parse(jString).getAsJsonObject();
-                                        Barang barang = new Barang(
-                                                object.get("code").getAsString(),
-                                                object.get("nama").getAsString(),
-                                                object.get("stock").getAsInt(),
-                                                object.get("gambar").toString(),
-                                                object.get("harga").getAsInt());
-                                        barangList.add(barang);
+                                    if (jsonArray != null) {
+                                        for (int i = 0; i < jsonArray.length(); i++) {
+                                            String jString = jsonArray.get(i).toString();
+                                            JsonParser parser = new JsonParser();
+                                            JsonObject object = parser.parse(jString).getAsJsonObject();
+                                            Barang barang = new Barang(
+                                                    object.get("code").getAsString(),
+                                                    object.get("nama").getAsString(),
+                                                    object.get("stock").getAsInt(),
+                                                    object.get("gambar").toString(),
+                                                    object.get("harga").getAsInt());
+                                            barangList.add(barang);
+                                        }
+                                        adapter = new ProductAdapter(barangList);
+                                        productsView.setAdapter(adapter);
+                                        productsView.setLayoutManager(new LinearLayoutManager(getContext()));
+                                    } else {
+                                        // something must do here, but I don't know what must I do
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                     Toast.makeText(getContext(), "Cannot get data", Toast.LENGTH_SHORT).show();
                                 }
-                                adapter = new ProductAdapter(barangList);
-                                productsView.setAdapter(adapter);
-                                productsView.setLayoutManager(new LinearLayoutManager(getContext()));
                                 spinner.setVisibility(View.GONE);
                                 productsView.setVisibility(View.VISIBLE);
                             }
@@ -176,8 +171,8 @@ public class ProductsFragment extends Fragment {
     }
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
         void buttonProduct();
+        String imageFromGallery();
     }
 
 }

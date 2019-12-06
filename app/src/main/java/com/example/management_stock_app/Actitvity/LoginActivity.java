@@ -6,10 +6,12 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.management_stock_app.Fragments.LoginFragment;
+import com.example.management_stock_app.Fragments.RegisterFragment;
 import com.example.management_stock_app.MainActivity;
 import com.example.management_stock_app.R;
 
 public class LoginActivity extends AppCompatActivity implements
+        RegisterFragment.OnFragmentInteractionListener,
         LoginFragment.OnFragmentInteractionListener {
 
     @Override
@@ -25,5 +27,19 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     public void onLoginSuccess() {
         startActivity(new Intent(this, MainActivity.class));
+    }
+
+    @Override
+    public void registrationPhase() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.login_activity, new RegisterFragment())
+                .commit();
+    }
+
+    @Override
+    public void tourToLogin() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.login_activity, new LoginFragment())
+                .commit();
     }
 }

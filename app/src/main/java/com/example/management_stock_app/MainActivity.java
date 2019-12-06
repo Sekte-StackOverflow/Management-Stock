@@ -3,6 +3,7 @@ package com.example.management_stock_app;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -48,6 +49,11 @@ public class MainActivity extends AppCompatActivity implements
                 .replace(R.id.main_container, new ProductsFragment())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public String imageFromGallery() {
+        return "Its Work Boy";
     }
 
     @Override
