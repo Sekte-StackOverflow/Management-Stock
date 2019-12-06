@@ -57,29 +57,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         fab1.setOnClickListener(this);
         fab2.setOnClickListener(this);
 
-        product = view.findViewById(R.id.Productbutton);
-        product.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.buttonProduct();
-            }
-        });
-
-        stock = view.findViewById(R.id.Stockbutton);
-        stock.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.buttonStocks();
-            }
-        });
-
-        transaction = view.findViewById(R.id.Transactionbutton);
-        transaction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.buttonTransaction();
-            }
-        });
 
         return view;
     }
