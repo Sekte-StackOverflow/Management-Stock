@@ -52,6 +52,7 @@ public class ProductsFragment extends Fragment {
     public List<Barang> barangList = new ArrayList<>();
     private User userData;
     private ProductAdapter adapter;
+    private  String userEmail;
 
     private TextView testView;
     private Button btnTest;
@@ -70,7 +71,7 @@ public class ProductsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_products, container, false);
         firestore = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        final String userEmail = firebaseUser.getEmail();
+        userEmail = firebaseUser.getEmail();
         btnTest = view.findViewById(R.id.btn_test);
         testView = view.findViewById(R.id.textView2);
         productsView = view.findViewById(R.id.rv_products);

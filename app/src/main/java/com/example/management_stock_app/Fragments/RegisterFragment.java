@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,8 +35,9 @@ public class RegisterFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    private EditText email, pass1, pass2;
+    private EditText email, password;
     private Button btnReg;
+    private ProgressBar spinner;
 
     private FirebaseAuth auth;
     private FirebaseFirestore firestore;
@@ -53,6 +55,9 @@ public class RegisterFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_register, container, false);
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
+        email = view.findViewById(R.id.reg_email);
+        password = view.findViewById(R.id.reg_password);
+        btnReg = view.findViewById(R.id.btn_new_account);
 
         return view;
     }
