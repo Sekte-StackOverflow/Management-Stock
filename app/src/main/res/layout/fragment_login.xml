@@ -11,8 +11,8 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
-        android:layout_width="370dp"
-        android:layout_height="520dp"
+        android:layout_width="300dp"
+        android:layout_height="500dp"
         android:layout_marginBottom="110dp"
         android:foreground="?android:attr/selectableItemBackground"
         app:cardBackgroundColor="#FFE9E9"
@@ -113,21 +113,21 @@
     </androidx.cardview.widget.CardView>
 
     <Button
+        android:id="@+id/btn_login"
         android:layout_width="150dp"
         android:layout_height="40dp"
-        android:id="@+id/btn_login"
-        android:text="Login"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:background="@drawable/shapes"
         android:layout_margin="10dp"
+        android:background="@drawable/shapes"
         android:elevation="20dp"
-        app:layout_constraintCircleRadius="15dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:text="Login"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintCircleRadius="15dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.061"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView"
-        app:layout_constraintVertical_bias="0.225" />
+        app:layout_constraintVertical_bias="0.523" />
 
     <Button
         android:id="@+id/btn_register"
@@ -140,11 +140,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintCircleRadius="15dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.938"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView"
-        app:layout_constraintVertical_bias="0.866" />
-
+        app:layout_constraintVertical_bias="0.523" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
