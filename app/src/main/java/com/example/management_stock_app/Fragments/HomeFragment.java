@@ -66,7 +66,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         int id = v.getId();
         switch (id){
             case R.id.fab_menu:
-
                 animateFAB();
                 break;
             case R.id.fab_in:
@@ -80,9 +79,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         }
     }
     public void animateFAB(){
-
         if(isFabOpen){
-
             fab.startAnimation(rotate_backward);
             fab1.startAnimation(fab_close);
             fab2.startAnimation(fab_close);
@@ -90,9 +87,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
             fab2.setClickable(false);
             isFabOpen = false;
             Log.d("tes", "close");
-
         } else {
-
             fab.startAnimation(rotate_forward);
             fab1.startAnimation(fab_open);
             fab2.startAnimation(fab_open);
@@ -100,7 +95,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
             fab2.setClickable(true);
             isFabOpen = true;
             Log.d("tes","open");
-
         }
     }
 

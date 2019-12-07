@@ -2,11 +2,12 @@ package com.example.management_stock_app.Fragments;
 
 
 import android.content.Context;
-import android.net.Uri;
+import android.graphics.Canvas;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
+import com.chad.library.adapter.base.listener.OnItemSwipeListener;
 import com.example.management_stock_app.Adapters.ProductAdapter;
 import com.example.management_stock_app.Models.Barang;
 import com.example.management_stock_app.Models.User;
@@ -82,8 +85,7 @@ public class ProductsFragment extends Fragment {
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String uri = mListener.imageFromGallery();
-                Toast.makeText(getContext(), uri, Toast.LENGTH_SHORT).show();
+                mListener.addNewProduct();
             }
         });
 
@@ -115,11 +117,10 @@ public class ProductsFragment extends Fragment {
                                                     object.get("harga").getAsInt());
                                             barangList.add(barang);
                                         }
-                                        adapter = new ProductAdapter(barangList);
-                                        productsView.setAdapter(adapter);
-                                        productsView.setLayoutManager(new LinearLayoutManager(getContext()));
+                                        mListener.setDataBarang(barangList, userData);
+                                        adapterData(barangList);
                                     } else {
-                                        // something must do here, but I don't know what must I do
+                                        Toast.makeText(getContext(), "Your Have no Product Yet", Toast.LENGTH_SHORT).show();
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -154,6 +155,30 @@ public class ProductsFragment extends Fragment {
         });
     }
 
+    public void adapterData(List<Barang> list) {
+        adapter = new ProductAdapter(list);
+        ItemDragAndSwipeCallback swipeCallback = new ItemDragAndSwipeCallback(adapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(swipeCallback);
+        touchHelper.attachToRecyclerView(productsView);
+        adapter.enableSwipeItem();
+        adapter.setOnItemSwipeListener(new OnItemSwipeListener() {
+            @Override
+            public void onItemSwipeStart(RecyclerView.ViewHolder viewHolder, int i) { }
+            @Override
+            public void clearView(RecyclerView.ViewHolder viewHolder, int i) {
+                Toast.makeText(getContext(), "Clear View", Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onItemSwiped(RecyclerView.ViewHolder viewHolder, int i) { }
+            @Override
+            public void onItemSwipeMoving(Canvas canvas, RecyclerView.ViewHolder viewHolder, float v, float v1, boolean b) {
+                Toast.makeText(getContext(), "Swipe Moving =" + b, Toast.LENGTH_SHORT).show();
+            }
+        });
+        productsView.setAdapter(adapter);
+        productsView.setLayoutManager(new LinearLayoutManager(getContext()));
+    }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -173,7 +198,8 @@ public class ProductsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void buttonProduct();
-        String imageFromGallery();
+        void addNewProduct();
+        void setDataBarang(List<Barang> dataBarang, User user);
     }
 
 }

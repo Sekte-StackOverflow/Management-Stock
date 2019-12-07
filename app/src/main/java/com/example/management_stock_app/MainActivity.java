@@ -1,12 +1,15 @@
 package com.example.management_stock_app;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -18,9 +21,20 @@ import com.example.management_stock_app.Fragments.ProductOutFragment;
 import com.example.management_stock_app.Fragments.ProductsFragment;
 import com.example.management_stock_app.Fragments.StocksFragment;
 import com.example.management_stock_app.Fragments.TransactionFragment;
+import com.example.management_stock_app.Models.Barang;
+import com.example.management_stock_app.Models.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         HomeFragment.OnFragmentInteractionListener,
@@ -31,16 +45,17 @@ public class MainActivity extends AppCompatActivity implements
         TransactionFragment.OnFragmentInteractionListener,
         BottomNavigationView.OnNavigationItemSelectedListener{
 
+    private List<Barang> barangList = new ArrayList<>();
+    private FirebaseFirestore firestore;
+    private User user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
-        //getSupportFragmentManager().beginTransaction()
-        //        .replace(R.id.main_container, new ProductsFragment())
-        //        .commit();
-
+        firestore = FirebaseFirestore.getInstance();
         loadFragment(new HomeFragment());
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
         // beri listener pada saat item/menu bottomnavigation terpilih
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
@@ -97,8 +112,20 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public String imageFromGallery() {
-        return "Its Work Boy";
+    public void addNewProduct() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_container, new ProductInFragment())
+                .commit();
+    }
+
+    @Override
+    public void setDataBarang(List<Barang> dataBarang, User user) {
+        if (!dataBarang.isEmpty()&& user != null) {
+            barangList = dataBarang;
+            this.user = user;
+        } else {
+            System.out.println("Data is Empty");
+        }
     }
 
     @Override
@@ -124,5 +151,30 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void buttonTransaction() {
 
+    }
+
+    @Override
+    public void goToProductList() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_container, new ProductsFragment())
+                .commit();
+    }
+
+    @Override
+    public void newBarangAdded(Barang barang) {
+        if (barang != null) {
+            barangList.add(barang);
+            firestore.collection("Users").document(user.getId())
+                    .update("Barang", barangList).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(MainActivity.this, "Update data Product success!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Update Failed!!!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 }

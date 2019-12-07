@@ -58,13 +58,26 @@ public class RegisterFragment extends Fragment {
         email = view.findViewById(R.id.reg_email);
         password = view.findViewById(R.id.reg_password);
         btnReg = view.findViewById(R.id.btn_new_account);
+        spinner = view.findViewById(R.id.progress_register);
+        spinner.setVisibility(View.GONE);
+
+        btnReg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String userEmail = email.getText().toString();
+                String pass = password.getText().toString();
+                createNewUser(userEmail, pass);
+            }
+        });
 
         return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
 
-    private void createNewUser(final String email, String pass) {
+    private void createNewUser(String newEmail, String pass) {
+        spinner.setVisibility(View.VISIBLE);
+        final String email = newEmail;
         auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -85,8 +98,10 @@ public class RegisterFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
+                            spinner.setVisibility(View.GONE);
                             Toast.makeText(getActivity(), "Success create new user", Toast.LENGTH_SHORT).show();
                         } else {
+                            spinner.setVisibility(View.GONE);
                             Toast.makeText(getActivity(), "Failed create new user", Toast.LENGTH_SHORT).show();
                         }
                     }
