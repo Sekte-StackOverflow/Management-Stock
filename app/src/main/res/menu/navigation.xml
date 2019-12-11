@@ -1,14 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/action_home"
-        android:title="Home"
-        android:icon="@drawable/home" />
-    <item android:id="@+id/action_product"
-        android:title="Product"
-        android:icon="@drawable/box2" />
-    <item android:id="@+id/action_low_stock"
-        android:title="Low Stock"
-        android:icon="@drawable/stocks" />
-    <item android:id="@+id/action_transaction"
-        android:title="Transaction"
-        android:icon="@drawable/transaction2" />
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/action_home"
+            android:title="Home"
+            android:icon="@drawable/home" />
+        <item android:id="@+id/action_product"
+            android:title="Product"
+            android:icon="@drawable/box2" />
+        <item android:id="@+id/action_low_stock"
+            android:title="Low Stock"
+            android:icon="@drawable/stocks" />
+        <item android:id="@+id/action_transaction"
+            android:title="Transaction"
+            android:icon="@drawable/transaction2" />
+    </group>
 </menu>

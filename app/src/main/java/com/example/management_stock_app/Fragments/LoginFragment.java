@@ -55,7 +55,7 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        //((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         emailField = view.findViewById(R.id.input_username);
         passwordField = view.findViewById(R.id.input_password);
         loadingBar = view.findViewById(R.id.progressBar3);

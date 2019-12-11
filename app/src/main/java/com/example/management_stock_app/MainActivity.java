@@ -2,15 +2,24 @@ package com.example.management_stock_app;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.management_stock_app.Fragments.HomeFragment;
@@ -26,6 +35,7 @@ import com.example.management_stock_app.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -43,28 +53,32 @@ public class MainActivity extends AppCompatActivity implements
         ProductOutFragment.OnFragmentInteractionListener,
         StocksFragment.OnFragmentInteractionListener,
         TransactionFragment.OnFragmentInteractionListener,
-        BottomNavigationView.OnNavigationItemSelectedListener{
+        BottomNavigationView.OnNavigationItemSelectedListener
+        {
 
     private List<Barang> barangList = new ArrayList<>();
     private FirebaseFirestore firestore;
     private User user;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         firestore = FirebaseFirestore.getInstance();
-        loadFragment(new HomeFragment());
 
+        loadFragment(new HomeFragment());
         BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
         // beri listener pada saat item/menu bottomnavigation terpilih
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
     }
 
+
     private boolean loadFragment(Fragment fragment) {
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
+                    .replace(R.id.flcontent, fragment)
                     .addToBackStack(null)
                     .commit();
             return true;
@@ -72,25 +86,25 @@ public class MainActivity extends AppCompatActivity implements
         return false;
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Fragment fragment = null;
-        switch (menuItem.getItemId()) {
-            case R.id.action_home:
-                fragment = new HomeFragment();
-                break;
-            case R.id.action_product:
-                fragment = new ProductsFragment();
-                break;
-            case R.id.action_low_stock:
-                fragment = new StocksFragment();
-                break;
-            case R.id.action_transaction:
-                fragment = new TransactionFragment();
-                break;
-        }
-        return loadFragment(fragment);
-    }
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                Fragment fragment = null;
+                switch (menuItem.getItemId()) {
+                    case R.id.action_home:
+                        fragment = new HomeFragment();
+                        break;
+                    case R.id.action_product:
+                        fragment = new ProductsFragment();
+                        break;
+                    case R.id.action_low_stock:
+                        fragment = new StocksFragment();
+                        break;
+                    case R.id.action_transaction:
+                        fragment = new TransactionFragment();
+                        break;
+                }
+                return loadFragment(fragment);
+            }
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
@@ -106,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void buttonProduct() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_container, new ProductsFragment())
+                .replace(R.id.flcontent, new ProductsFragment())
                 .addToBackStack(null)
                 .commit();
     }
@@ -114,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void addNewProduct() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_container, new ProductInFragment())
+                .replace(R.id.flcontent, new ProductInFragment())
                 .commit();
     }
 
@@ -131,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void buttonInput() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_container, new ProductInFragment())
+                .replace(R.id.flcontent, new ProductInFragment())
                 .addToBackStack(null)
                 .commit();
     }
@@ -139,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void buttonOutput() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_container, new ProductOutFragment())
+                .replace(R.id.flcontent, new ProductOutFragment())
                 .addToBackStack(null)
                 .commit();
     }
@@ -156,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void goToProductList() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_container, new ProductsFragment())
+                .replace(R.id.flcontent, new ProductsFragment())
                 .commit();
     }
 
