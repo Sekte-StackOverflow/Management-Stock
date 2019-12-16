@@ -82,7 +82,8 @@ public class RegisterFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    writeNewUser(email);
+                    String code = task.getResult().getUser().getUid();
+                    writeNewUser(code ,email);
                 } else {
                     Toast.makeText(getActivity(), "Failed Register", Toast.LENGTH_SHORT).show();
                 }
@@ -90,13 +91,13 @@ public class RegisterFragment extends Fragment {
         });
     }
 
-    private void writeNewUser(String email) {
+    private void writeNewUser(String code ,String email) {
         String username = usernameFromEmail(email);
         User user = new User(username, email);
-        firestore.collection("Users").add(user)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+        firestore.collection("Users").document(code).set(user)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                    public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             spinner.setVisibility(View.GONE);
                             Toast.makeText(getActivity(), "Success create new user", Toast.LENGTH_SHORT).show();

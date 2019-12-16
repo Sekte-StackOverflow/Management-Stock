@@ -29,6 +29,7 @@ import com.example.management_stock_app.Fragments.ProductInFragment;
 import com.example.management_stock_app.Fragments.ProductOutFragment;
 import com.example.management_stock_app.Fragments.ProductsFragment;
 import com.example.management_stock_app.Fragments.StocksFragment;
+import com.example.management_stock_app.Fragments.TransactionChartFragment;
 import com.example.management_stock_app.Fragments.TransactionFragment;
 import com.example.management_stock_app.Models.Barang;
 import com.example.management_stock_app.Models.User;
@@ -53,14 +54,13 @@ public class MainActivity extends AppCompatActivity implements
         ProductOutFragment.OnFragmentInteractionListener,
         StocksFragment.OnFragmentInteractionListener,
         TransactionFragment.OnFragmentInteractionListener,
-        BottomNavigationView.OnNavigationItemSelectedListener
+        BottomNavigationView.OnNavigationItemSelectedListener,
+        TransactionChartFragment.OnFragmentInteractionListener
         {
 
     private List<Barang> barangList = new ArrayList<>();
     private FirebaseFirestore firestore;
     private User user;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-
     @Override
     public void onFragmentInteraction(Uri uri) {
         Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
@@ -126,9 +125,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void addNewProduct() {
+    public void addNewProduct(User user) {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.flcontent, new ProductInFragment())
+                .replace(R.id.flcontent, new TransactionChartFragment())
                 .commit();
     }
 
@@ -152,10 +151,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void buttonOutput() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.flcontent, new ProductOutFragment())
-                .addToBackStack(null)
-                .commit();
+
     }
     @Override
     public void buttonStocks() {

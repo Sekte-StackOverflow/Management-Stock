@@ -29,6 +29,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     Button product, stock, transaction;
     private Boolean isFabOpen = false;
     private FloatingActionButton fab,fab1,fab2;
+    private Fragment chart;
+
     private Animation fab_open,fab_close,rotate_forward,rotate_backward;
     private OnFragmentInteractionListener mListener;
 
@@ -45,7 +47,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         //((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-
         fab = view.findViewById(R.id.fab_menu);
         fab1 = view.findViewById(R.id.fab_in);
         fab2 = view.findViewById(R.id.fab_out);
@@ -56,8 +57,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         fab.setOnClickListener(this);
         fab1.setOnClickListener(this);
         fab2.setOnClickListener(this);
-
-
         return view;
     }
 

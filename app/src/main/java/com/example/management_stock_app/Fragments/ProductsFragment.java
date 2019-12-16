@@ -3,6 +3,7 @@ package com.example.management_stock_app.Fragments;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,8 @@ import com.example.management_stock_app.Models.Barang;
 import com.example.management_stock_app.Models.User;
 import com.example.management_stock_app.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,6 +38,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -51,11 +57,12 @@ public class ProductsFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private FirebaseFirestore firestore;
     private FirebaseUser firebaseUser;
+    private FirebaseStorage storage;
 
     public List<Barang> barangList = new ArrayList<>();
     private User userData;
     private ProductAdapter adapter;
-    private  String userEmail;
+    private String userEmail;
 
     private TextView testView;
     private Button btnTest;
@@ -74,6 +81,7 @@ public class ProductsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_products, container, false);
         firestore = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        storage = FirebaseStorage.getInstance();
         userEmail = firebaseUser.getEmail();
         btnTest = view.findViewById(R.id.btn_test);
         testView = view.findViewById(R.id.textView2);
@@ -81,81 +89,70 @@ public class ProductsFragment extends Fragment {
         spinner = view.findViewById(R.id.progressProduct);
         spinner.setVisibility(View.GONE);
         productsView.setVisibility(View.GONE);
-        databaseCheck(userEmail);
+        getDatabase();
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.addNewProduct();
             }
         });
 
         return view;
     }
-    public void databaseCheck(String email) {
-        productsView.setVisibility(View.GONE);
-        spinner.setVisibility(View.VISIBLE);
-        firestore.collection("Users").whereEqualTo("email", email).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (DocumentSnapshot user: task.getResult()) {
-                                userData = new User(user.getId(), user.get("name").toString(), user.get("email").toString());
-                                testView.setText("User Account: "+userData.getName());
-                                try {
-                                    JSONArray jsonArray = new JSONArray(user.get("Barang").toString());
-                                    if (jsonArray != null) {
-                                        for (int i = 0; i < jsonArray.length(); i++) {
-                                            String jString = jsonArray.get(i).toString();
-                                            JsonParser parser = new JsonParser();
-                                            JsonObject object = parser.parse(jString).getAsJsonObject();
-                                            Barang barang = new Barang(
-                                                    object.get("code").getAsString(),
-                                                    object.get("nama").getAsString(),
-                                                    object.get("stock").getAsInt(),
-                                                    object.get("gambar").toString(),
-                                                    object.get("harga").getAsInt());
-                                            barangList.add(barang);
-                                        }
-                                        mListener.setDataBarang(barangList, userData);
-                                        adapterData(barangList);
-                                    } else {
-                                        Toast.makeText(getContext(), "Your Have no Product Yet", Toast.LENGTH_SHORT).show();
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    Toast.makeText(getContext(), "Cannot get data", Toast.LENGTH_SHORT).show();
-                                }
-                                spinner.setVisibility(View.GONE);
-                                productsView.setVisibility(View.VISIBLE);
-                            }
-                        } else {
-                            spinner.setVisibility(View.GONE);
-                            Toast.makeText(getContext(), "Failed load data Barang", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
 
-    public void addBarangDatabase(String id, final Barang data) {
-        if (data != null) {
-            barangList.add(data);
-        }
-        firestore.collection("Users").document(id)
-                .update("Barang", barangList).addOnCompleteListener(new OnCompleteListener<Void>() {
+    private void getDatabase() {
+        spinner.setVisibility(View.VISIBLE);
+        firestore.collection("Users").document(firebaseUser.getUid())
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                    if (data != null) {
-                        adapter.addData(data);
-                    }
-                    Toast.makeText(getContext(), "Add Complete", Toast.LENGTH_SHORT).show();
+                    DocumentSnapshot myData = task.getResult();
+                    userData = new User(myData.getId(), myData.get("name").toString(), myData.get("email").toString());
+                    getSubCollection(userData);
+                } else {
+                    Toast.makeText(getContext(), "Cannot get Collection", Toast.LENGTH_SHORT).show();
+                    spinner.setVisibility(View.GONE);
                 }
             }
         });
     }
+    private void getSubCollection(User user) {
+        firestore.collection("Users").document(user.getId())
+                .collection("Barang").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    if (!task.getResult().isEmpty()) {
+                        for (DocumentSnapshot product: task.getResult()) {
+                            Barang barang = new Barang(product.getId(),
+                                    product.get("nama").toString(),
+                                    product.get("gambar").toString(),
+                                    Integer.valueOf(product.get("stock").toString()),
+                                    Integer.valueOf(product.get("harga").toString()));
+                            barangList.add(barang);
+                            spinner.setVisibility(View.GONE);
+                            productsView.setVisibility(View.VISIBLE);
+                            adapterData(barangList);
+                        }
+                    } else {
+                        spinner.setVisibility(View.GONE);
+                        Log.d(TAG, "Your Data Barang Is Empty");
+                    }
 
-    public void adapterData(List<Barang> list) {
+                } else {
+                    spinner.setVisibility(View.GONE);
+                    Log.d(TAG, "Failed Please Check Your Connection");
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, e.getMessage());
+            }
+        });
+    }
+
+    private void adapterData(List<Barang> list) {
         adapter = new ProductAdapter(list);
         ItemDragAndSwipeCallback swipeCallback = new ItemDragAndSwipeCallback(adapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(swipeCallback);
@@ -165,15 +162,11 @@ public class ProductsFragment extends Fragment {
             @Override
             public void onItemSwipeStart(RecyclerView.ViewHolder viewHolder, int i) { }
             @Override
-            public void clearView(RecyclerView.ViewHolder viewHolder, int i) {
-                Toast.makeText(getContext(), "Clear View", Toast.LENGTH_SHORT).show();
-            }
+            public void clearView(RecyclerView.ViewHolder viewHolder, int i) { }
             @Override
             public void onItemSwiped(RecyclerView.ViewHolder viewHolder, int i) { }
             @Override
-            public void onItemSwipeMoving(Canvas canvas, RecyclerView.ViewHolder viewHolder, float v, float v1, boolean b) {
-                Toast.makeText(getContext(), "Swipe Moving =" + b, Toast.LENGTH_SHORT).show();
-            }
+            public void onItemSwipeMoving(Canvas canvas, RecyclerView.ViewHolder viewHolder, float v, float v1, boolean b) { }
         });
         productsView.setAdapter(adapter);
         productsView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -198,7 +191,7 @@ public class ProductsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void buttonProduct();
-        void addNewProduct();
+        void addNewProduct(User user);
         void setDataBarang(List<Barang> dataBarang, User user);
     }
 

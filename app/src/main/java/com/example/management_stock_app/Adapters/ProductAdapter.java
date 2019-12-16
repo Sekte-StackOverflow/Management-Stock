@@ -25,10 +25,15 @@ public class ProductAdapter extends BaseItemDraggableAdapter<Barang, BaseViewHol
     protected void convert(@NonNull BaseViewHolder helper, Barang product) {
         ImageView img = helper.getView(R.id.product_image);
         String uri = "https://static.thenounproject.com/png/583402-200.png";
+        if (product.getGambar().equals("kosong")) {
+            Picasso.get().load(uri).into(img);
+        } else {
+            Picasso.get().load(product.getGambar()).into(img);
+        }
         helper.setText(R.id.product_name, product.getNama())
                 .setText(R.id.product_code, product.getCode())
                 .setText(R.id.product_stock, String.valueOf(product.getStock()))
                 .setText(R.id.product_harga, String.valueOf(product.getHarga()));
-        Picasso.get().load(uri).into(img);
+
     }
 }

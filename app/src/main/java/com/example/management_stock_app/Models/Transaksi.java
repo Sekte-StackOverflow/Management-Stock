@@ -20,15 +20,4 @@ public class Transaksi {
         return currentStock;
     }
 
-    public void inputStock(int i) {
-        if (currentStock > 0) {
-            this.currentStock += i;
-        }
-    }
-
-    public void outputStock(int i) {
-        if (currentStock > 0) {
-            this.currentStock -= i;
-        }
-    }
 }
