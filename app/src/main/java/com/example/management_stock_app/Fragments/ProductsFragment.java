@@ -83,18 +83,18 @@ public class ProductsFragment extends Fragment {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         storage = FirebaseStorage.getInstance();
         userEmail = firebaseUser.getEmail();
-        btnTest = view.findViewById(R.id.btn_test);
+        //btnTest = view.findViewById(R.id.btn_test);
         testView = view.findViewById(R.id.textView2);
         productsView = view.findViewById(R.id.rv_products);
         spinner = view.findViewById(R.id.progressProduct);
         spinner.setVisibility(View.GONE);
         productsView.setVisibility(View.GONE);
         getDatabase();
-        btnTest.setOnClickListener(new View.OnClickListener() {
+        /*btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
             }
-        });
+        });*/
 
         return view;
     }

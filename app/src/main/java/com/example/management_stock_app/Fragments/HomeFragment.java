@@ -1,6 +1,7 @@
 package com.example.management_stock_app.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -15,8 +16,10 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
+import com.example.management_stock_app.Actitvity.LoginActivity;
 import com.example.management_stock_app.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
@@ -72,8 +75,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
                 Log.d("tes", "Fab in");
                 break;
             case R.id.fab_out:
-                mListener.buttonOutput();
-                Log.d("tes", "Fab out");
+                //mListener.buttonOutput();
+                FirebaseAuth.getInstance().signOut();
+                Intent i = new Intent(getActivity(),
+                        LoginActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(i);
+
+                Log.d("tes", "log out");
                 break;
         }
     }

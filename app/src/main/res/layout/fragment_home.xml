@@ -47,7 +47,7 @@
 
         android:backgroundTint="@color/white"
 
-        android:src="@drawable/minus"
+        android:src="@drawable/logout"
         android:visibility="invisible"
         app:elevation="6dp"
         app:layout_constraintBottom_toBottomOf="parent"

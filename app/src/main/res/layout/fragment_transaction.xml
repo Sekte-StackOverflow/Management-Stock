@@ -23,7 +23,7 @@
 
     <EditText
         android:id="@+id/editText4"
-        android:layout_width="260dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:ems="10"
@@ -37,6 +37,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
+        android:background="@android:color/white"
+        android:drawableLeft="@drawable/tap"
         android:text="choose"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/editText4"
@@ -44,13 +46,15 @@
 
     <EditText
         android:id="@+id/editText5"
-        android:layout_width="0dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Product Name"
         app:layout_constraintEnd_toEndOf="@+id/editText4"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText4" />
 
@@ -58,7 +62,7 @@
         android:id="@+id/editText6"
         android:layout_width="78dp"
         android:layout_height="47dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="64dp"
         android:ems="10"
         android:inputType="number"
         app:layout_constraintStart_toEndOf="@+id/btn_incr"
@@ -68,8 +72,10 @@
         android:id="@+id/btn_decr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Decrease"
+        android:layout_marginTop="64dp"
+        android:background="@android:color/white"
+        android:drawableLeft="@drawable/decrease"
+        android:text="  Decrease"
         app:layout_constraintStart_toEndOf="@+id/editText6"
         app:layout_constraintTop_toBottomOf="@+id/editText5" />
 
@@ -78,8 +84,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:text="Increase"
+        android:layout_marginTop="64dp"
+        android:background="@android:color/white"
+        android:drawableLeft="@drawable/increase"
+        android:text="  Increase"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText5" />
 
@@ -87,7 +95,7 @@
         android:layout_width="0dp"
         android:layout_height="98dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btn_decr"
+        app:layout_constraintStart_toEndOf="@+id/editText5"
         app:layout_constraintTop_toBottomOf="@+id/choose_product">
 
         <TextView

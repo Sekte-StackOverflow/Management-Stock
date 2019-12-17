@@ -65,7 +65,7 @@ public class LoginFragment extends Fragment {
         fireAuth = FirebaseAuth.getInstance();
         mfFirestore = FirebaseFirestore.getInstance();
 
-        loadingBar.setVisibility(View.GONE);
+        //loadingBar.setVisibility(View.GONE);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,12 +100,12 @@ public class LoginFragment extends Fragment {
     private void buttonGone() {
         btnReg.setVisibility(View.GONE);
         btnLogin.setVisibility(View.GONE);
-        loadingBar.setVisibility(View.VISIBLE);
+        //loadingBar.setVisibility(View.VISIBLE);
     }
     private void buttonVisible() {
         btnReg.setVisibility(View.VISIBLE);
         btnLogin.setVisibility(View.VISIBLE);
-        loadingBar.setVisibility(View.GONE);
+        //loadingBar.setVisibility(View.GONE);
     }
 
     private void signIn(final String email, String pass) {
