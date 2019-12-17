@@ -1,5 +1,6 @@
 package com.example.management_stock_app.Fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -58,7 +59,7 @@ public class LoginFragment extends Fragment {
         //((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         emailField = view.findViewById(R.id.input_username);
         passwordField = view.findViewById(R.id.input_password);
-        loadingBar = view.findViewById(R.id.progressBar3);
+        //loadingBar = view.findViewById(R.id.progressBar3);
         btnLogin = view.findViewById(R.id.btn_login);
         btnReg = view.findViewById(R.id.btn_register);
         fireAuth = FirebaseAuth.getInstance();
@@ -108,6 +109,10 @@ public class LoginFragment extends Fragment {
     }
 
     private void signIn(final String email, String pass) {
+        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setTitle("Login...");
+
+        progressDialog.show();
         buttonGone();
         fireAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -117,6 +122,7 @@ public class LoginFragment extends Fragment {
                     if (task.getResult().getUser() != null) {
                         user =  task.getResult().getUser();
                         mListener.onLoginSuccess();
+                        progressDialog.dismiss();
                     }
                 } else {
                     buttonVisible();
