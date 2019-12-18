@@ -111,7 +111,6 @@ public class LoginFragment extends Fragment {
     private void signIn(final String email, String pass) {
         final ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setTitle("Login...");
-
         progressDialog.show();
         buttonGone();
         fireAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -127,6 +126,7 @@ public class LoginFragment extends Fragment {
                 } else {
                     buttonVisible();
                     Toast.makeText(getActivity(), "Failed Login", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
                 }
             }
         });

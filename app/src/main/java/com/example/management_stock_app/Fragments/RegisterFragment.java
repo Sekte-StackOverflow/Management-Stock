@@ -1,6 +1,7 @@
 package com.example.management_stock_app.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -16,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.management_stock_app.Actitvity.LoginActivity;
 import com.example.management_stock_app.Models.User;
 import com.example.management_stock_app.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -67,6 +69,7 @@ public class RegisterFragment extends Fragment {
                 String userEmail = email.getText().toString();
                 String pass = password.getText().toString();
                 createNewUser(userEmail, pass);
+
             }
         });
 
@@ -101,6 +104,11 @@ public class RegisterFragment extends Fragment {
                         if (task.isSuccessful()) {
                             spinner.setVisibility(View.GONE);
                             Toast.makeText(getActivity(), "Success create new user", Toast.LENGTH_SHORT).show();
+                            Intent i = new Intent(getActivity(),
+                                    LoginActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                                    Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(i);
                         } else {
                             spinner.setVisibility(View.GONE);
                             Toast.makeText(getActivity(), "Failed create new user", Toast.LENGTH_SHORT).show();

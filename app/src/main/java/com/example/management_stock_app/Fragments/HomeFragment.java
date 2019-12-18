@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.management_stock_app.Actitvity.LoginActivity;
 import com.example.management_stock_app.R;
@@ -82,7 +83,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                         Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(i);
-
+                Toast.makeText(getActivity(), "Your Logout", Toast.LENGTH_SHORT).show();
                 Log.d("tes", "log out");
                 break;
         }
