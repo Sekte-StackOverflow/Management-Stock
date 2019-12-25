@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
 import com.chad.library.adapter.base.listener.OnItemSwipeListener;
 import com.example.management_stock_app.Adapters.ProductAdapter;
@@ -59,7 +60,7 @@ public class ProductsFragment extends Fragment {
     private FirebaseUser firebaseUser;
     private FirebaseStorage storage;
 
-    public List<Barang> barangList = new ArrayList<>();
+    private List<Barang> barangList = new ArrayList<>();
     private User userData;
     private ProductAdapter adapter;
     private String userEmail;
@@ -152,21 +153,29 @@ public class ProductsFragment extends Fragment {
         });
     }
 
+    private void deleteProduct(String code) {
+        firestore.collection("Users").document(firebaseUser.getUid())
+                .collection("Barang").document(code).delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getContext(), "Delete Success!!", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "Success Delete Barang Item");
+                        } else {
+                            Toast.makeText(getContext(), "Delete Failed!!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
     private void adapterData(List<Barang> list) {
         adapter = new ProductAdapter(list);
-        ItemDragAndSwipeCallback swipeCallback = new ItemDragAndSwipeCallback(adapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(swipeCallback);
-        touchHelper.attachToRecyclerView(productsView);
-        adapter.enableSwipeItem();
-        adapter.setOnItemSwipeListener(new OnItemSwipeListener() {
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
-            public void onItemSwipeStart(RecyclerView.ViewHolder viewHolder, int i) { }
-            @Override
-            public void clearView(RecyclerView.ViewHolder viewHolder, int i) { }
-            @Override
-            public void onItemSwiped(RecyclerView.ViewHolder viewHolder, int i) { }
-            @Override
-            public void onItemSwipeMoving(Canvas canvas, RecyclerView.ViewHolder viewHolder, float v, float v1, boolean b) { }
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                System.out.println("Position: "+position);
+            }
         });
         productsView.setAdapter(adapter);
         productsView.setLayoutManager(new LinearLayoutManager(getContext()));

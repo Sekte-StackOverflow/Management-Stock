@@ -5,8 +5,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,11 +21,17 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.management_stock_app.Actitvity.LoginActivity;
+import com.example.management_stock_app.Adapters.TransactionAdapter;
+import com.example.management_stock_app.Models.Transaksi;
 import com.example.management_stock_app.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +44,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     private Boolean isFabOpen = false;
     private FloatingActionButton fab,fab1,fab2;
     private Fragment chart;
+
+    private RecyclerView rvTransaction;
+    private TransactionAdapter adapter;
+    private List<Transaksi> transaksiList = new ArrayList<>();
 
     private Animation fab_open,fab_close,rotate_forward,rotate_backward;
     private OnFragmentInteractionListener mListener;
@@ -65,6 +79,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        rvTransaction = view.findViewById(R.id.rv_transaction);
+        transaksiList.add(new Transaksi("11", "test 1", 21, "IN"));
+        transaksiList.add(new Transaksi("12", "test 2", 30, "OUT"));
+        adapter = new TransactionAdapter(transaksiList);
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Transaksi transaksi = transaksiList.get(position);
+                Toast.makeText(getContext(), "Position = " + transaksi.getId() , Toast.LENGTH_SHORT).show();
+            }
+        });
+        rvTransaction.setAdapter(adapter);
+        rvTransaction.setLayoutManager(new LinearLayoutManager(getContext()));
+    }
+
+    @Override
     public void onClick(View v) {
         int id = v.getId();
         switch (id){
@@ -78,8 +110,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
             case R.id.fab_out:
                 //mListener.buttonOutput();
                 FirebaseAuth.getInstance().signOut();
-                Intent i = new Intent(getActivity(),
-                        LoginActivity.class);
+                Intent i = new Intent(getActivity(), LoginActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                         Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(i);

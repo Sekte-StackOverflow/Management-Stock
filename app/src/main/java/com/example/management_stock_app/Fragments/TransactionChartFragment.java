@@ -34,7 +34,8 @@ import java.util.List;
  * to handle interaction events.
  */
 public class TransactionChartFragment extends Fragment {
-    private int hand, in, out;
+    private int hand=0, in=0, out=0;
+    private PieChart chart;
     private List<PieEntry> data = new ArrayList<>();
     private TransactionViewModel transactionViewModel;
 
@@ -56,11 +57,46 @@ public class TransactionChartFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        PieChart chart = view.findViewById(R.id.stock_pie_chart);
+        chart = view.findViewById(R.id.stock_pie_chart);
         RelativeLayout rl = view.findViewById(R.id.layout_Chart);
-        data.add(new PieEntry(100, "Hand"));
-        data.add(new PieEntry(20, "Incoming"));
-        data.add(new PieEntry(40, "Outcome"));
+        data.add(new PieEntry(hand, "Hand"));
+        data.add(new PieEntry(in, "Incoming"));
+        data.add(new PieEntry(out, "Outcome"));
+        updateChart();
+
+        transactionViewModel.getHand().observe(requireActivity(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                hand = integer;
+                data.add(new PieEntry(hand, "Hand"));
+                data.add(new PieEntry(in, "Incoming"));
+                data.add(new PieEntry(out, "Outcome"));
+                updateChart();
+            }
+        });
+        transactionViewModel.getIn().observe(requireActivity(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                in = integer;
+                data.add(new PieEntry(hand, "Hand"));
+                data.add(new PieEntry(in, "Incoming"));
+                data.add(new PieEntry(out, "Outcome"));
+                updateChart();
+            }
+        });
+        transactionViewModel.getOut().observe(requireActivity(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                out = integer;
+                data.add(new PieEntry(hand, "Hand"));
+                data.add(new PieEntry(in, "Incoming"));
+                data.add(new PieEntry(out, "Outcome"));
+                updateChart();
+            }
+        });
+    }
+
+    private void updateChart() {
         int[] color = new int[]{Color.GRAY, Color.CYAN, Color.MAGENTA};
         PieDataSet pieDataSet = new PieDataSet(data, "");
         pieDataSet.setColors(color);
@@ -69,24 +105,6 @@ public class TransactionChartFragment extends Fragment {
         chart.setDrawHoleEnabled(false);
         chart.setData(pieData);
         chart.invalidate();
-        transactionViewModel.getHand().observe(requireActivity(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                hand = integer;
-            }
-        });
-        transactionViewModel.getIn().observe(requireActivity(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                in = integer;
-            }
-        });
-        transactionViewModel.getOut().observe(requireActivity(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                out = integer;
-            }
-        });
     }
 
     // TODO: Rename method, update argument and hook method into UI event
