@@ -22,7 +22,7 @@
         app:layout_constraintGuide_percent="0.7" />
 
     <EditText
-        android:id="@+id/editText4"
+        android:id="@+id/code_product"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -41,11 +41,11 @@
         android:drawableLeft="@drawable/tap"
         android:text="choose"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/editText4"
+        app:layout_constraintStart_toEndOf="@+id/code_product"
         app:layout_constraintTop_toTopOf="@+id/guideline4" />
 
     <EditText
-        android:id="@+id/editText5"
+        android:id="@+id/name_product"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -53,13 +53,13 @@
         android:ems="10"
         android:inputType="textPersonName"
         android:hint="Product Name"
-        app:layout_constraintEnd_toEndOf="@+id/editText4"
+        app:layout_constraintEnd_toEndOf="@+id/code_product"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText4" />
+        app:layout_constraintTop_toBottomOf="@+id/code_product" />
 
     <EditText
-        android:id="@+id/editText6"
+        android:id="@+id/number"
         android:layout_width="78dp"
         android:layout_height="47dp"
         android:layout_marginStart="20dp"
@@ -67,7 +67,7 @@
         android:ems="10"
         android:inputType="number"
         app:layout_constraintStart_toEndOf="@+id/btn_incr"
-        app:layout_constraintTop_toBottomOf="@+id/editText5" />
+        app:layout_constraintTop_toBottomOf="@+id/name_product" />
 
     <ImageButton
         android:id="@+id/btn_decr"
@@ -77,8 +77,8 @@
         android:layout_marginTop="64dp"
         android:background="@android:color/white"
         android:src="@drawable/minus_button"
-        app:layout_constraintStart_toEndOf="@+id/editText6"
-        app:layout_constraintTop_toBottomOf="@+id/editText5" />
+        app:layout_constraintStart_toEndOf="@+id/number"
+        app:layout_constraintTop_toBottomOf="@+id/name_product" />
 
     <ImageButton
         android:id="@+id/btn_incr"
@@ -90,17 +90,17 @@
         android:src="@drawable/add_button"
         android:text="  Increase"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText5" />
+        app:layout_constraintTop_toBottomOf="@+id/name_product" />
 
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="98dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/editText5"
+        app:layout_constraintStart_toEndOf="@+id/name_product"
         app:layout_constraintTop_toBottomOf="@+id/choose_product">
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/textview_stock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -109,5 +109,14 @@
             android:layout_marginTop="42dp"
             android:text="Current Stock" />
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_simpan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

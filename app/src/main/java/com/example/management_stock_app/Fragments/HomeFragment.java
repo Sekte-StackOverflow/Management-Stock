@@ -45,10 +45,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     private FloatingActionButton fab,fab1,fab2;
     private Fragment chart;
 
-    private RecyclerView rvTransaction;
-    private TransactionAdapter adapter;
-    private List<Transaksi> transaksiList = new ArrayList<>();
-
     private Animation fab_open,fab_close,rotate_forward,rotate_backward;
     private OnFragmentInteractionListener mListener;
 
@@ -81,19 +77,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        rvTransaction = view.findViewById(R.id.rv_transaction);
-        transaksiList.add(new Transaksi("11", "test 1", 21, "IN"));
-        transaksiList.add(new Transaksi("12", "test 2", 30, "OUT"));
-        adapter = new TransactionAdapter(transaksiList);
-        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                Transaksi transaksi = transaksiList.get(position);
-                Toast.makeText(getContext(), "Position = " + transaksi.getId() , Toast.LENGTH_SHORT).show();
-            }
-        });
-        rvTransaction.setAdapter(adapter);
-        rvTransaction.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     @Override

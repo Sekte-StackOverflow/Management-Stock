@@ -7,11 +7,11 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-
 public class TransactionViewModel extends AndroidViewModel {
     private MutableLiveData<Integer> hand;
     private MutableLiveData<Integer> out;
     private MutableLiveData<Integer> in;
+
 
     public TransactionViewModel(@NonNull Application application) {
         super(application);

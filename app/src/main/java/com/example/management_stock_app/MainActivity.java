@@ -31,6 +31,7 @@ import com.example.management_stock_app.Fragments.ProductsFragment;
 import com.example.management_stock_app.Fragments.StocksFragment;
 import com.example.management_stock_app.Fragments.TransactionChartFragment;
 import com.example.management_stock_app.Fragments.TransactionFragment;
+import com.example.management_stock_app.Fragments.TransactionViewFragment;
 import com.example.management_stock_app.Models.Barang;
 import com.example.management_stock_app.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -55,7 +56,8 @@ public class MainActivity extends AppCompatActivity implements
         StocksFragment.OnFragmentInteractionListener,
         TransactionFragment.OnFragmentInteractionListener,
         BottomNavigationView.OnNavigationItemSelectedListener,
-        TransactionChartFragment.OnFragmentInteractionListener
+        TransactionChartFragment.OnFragmentInteractionListener,
+        TransactionViewFragment.OnFragmentInteractionListener
         {
 
     private List<Barang> barangList = new ArrayList<>();
