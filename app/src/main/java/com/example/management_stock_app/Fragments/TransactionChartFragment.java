@@ -101,8 +101,8 @@ public class TransactionChartFragment extends Fragment {
                 updateChart();
             }
         });
-        addFakeData(new Transaksi("1232", "22-12-2019", 15, "IN"));
-        addFakeData(new Transaksi("2211", "22-12-2019", 30, "OUT"));
+        addFakeData(new Transaksi("1232", "", "22-12-2019", 15, "IN"));
+        addFakeData(new Transaksi("2211", "", "22-12-2019", 30, "OUT"));
     }
 
     private void updateChart() {
@@ -135,10 +135,10 @@ public class TransactionChartFragment extends Fragment {
 
     private void fakeTransaction() {
         Date date = new Date();
-        transaksi.add(new Transaksi("ID-01", date.toString(), 20, "IN"));
-        transaksi.add(new Transaksi("ID-02", date.toString(), 5, "OUT"));
-        transaksi.add(new Transaksi("ID-03", date.toString(), 20, "IN"));
-        transaksi.add(new Transaksi("ID-04", date.toString(), 10, "OUT"));
+        transaksi.add(new Transaksi("ID-01", "",date.toString(), 20, "IN"));
+        transaksi.add(new Transaksi("ID-02", "",date.toString(), 5, "OUT"));
+        transaksi.add(new Transaksi("ID-03", "",date.toString(), 20, "IN"));
+        transaksi.add(new Transaksi("ID-04", "",date.toString(), 10, "OUT"));
         for (Transaksi item :
                 transaksi) {
             if (item.getStatus().equals("IN")) {

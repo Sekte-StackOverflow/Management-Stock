@@ -2,6 +2,7 @@ package com.example.management_stock_app.Models;
 
 public class Transaksi {
     private String id;
+    private String name;
     private String date;
     private int currentStock;
     private String status;
@@ -9,10 +10,11 @@ public class Transaksi {
     public Transaksi() {
     }
 
-    public Transaksi(String id, String date, int currentStock, String status) {
+    public Transaksi(String id, String name, String date, int currentStock, String status) {
         this.id = id;
-        this.currentStock = currentStock;
+        this.name = name;
         this.date = date;
+        this.currentStock = currentStock;
         this.status = status;
     }
 
@@ -30,6 +32,14 @@ public class Transaksi {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setDate(String date) {

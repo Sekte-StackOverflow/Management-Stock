@@ -19,6 +19,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,10 +30,20 @@ import com.example.management_stock_app.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.jakewharton.threetenabp.AndroidThreeTen;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.threeten.bp.LocalDateTime;
+
+import java.lang.annotation.Repeatable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,10 +61,11 @@ public class TransactionFragment extends Fragment {
     private FirebaseAuth auth;
     private FirebaseFirestore firestore;
 
-    private Button btnSave, btnChoose;
+    private Button btnSave, btnChoose, btnCancel;
     private ImageButton btnInc, btnDec;
     private EditText code, productName, number;
     private TextView currentStock;
+    private RadioGroup radioGroup;
 
     private AlertDialog.Builder builder;
     private List<Barang> barangs = new ArrayList<>();
@@ -67,25 +80,27 @@ public class TransactionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        AndroidThreeTen.init(getContext());
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
         return inflater.inflate(R.layout.fragment_transaction, container, false);
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         btnInc = view.findViewById(R.id.btn_incr);
         btnDec = view.findViewById(R.id.btn_decr);
         btnSave = view.findViewById(R.id.btn_simpan);
+        btnCancel = view.findViewById(R.id.btn_cancel_transaction);
         btnChoose = view.findViewById(R.id.choose_product);
         code = view.findViewById(R.id.code_product);
         productName = view.findViewById(R.id.name_product);
         number = view.findViewById(R.id.number);
-        currentStock = view.findViewById(R.id.textview_stock);
+        currentStock = view.findViewById(R.id.stock_number);
+        radioGroup = view.findViewById(R.id.radioGroup);
 
         number.setText("0");
-
         btnInc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,6 +108,7 @@ public class TransactionFragment extends Fragment {
                 number.setText(String.valueOf(n + 1));
             }
         });
+
         btnDec.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,6 +165,63 @@ public class TransactionFragment extends Fragment {
                 }
             }
         });
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String date = LocalDateTime.now().toString();
+                String name = productName.getText().toString();
+                String cd = code.getText().toString();
+                String changeStock = number.getText().toString();
+                int selectedId = radioGroup.getCheckedRadioButtonId();
+                RadioButton radioButton = view.findViewById(selectedId);
+                if (!date.equals("") && !name.equals("") && !cd.equals("") && !(changeStock.equals("0") || changeStock.equals("")) && radioButton != null) {
+                    String status = radioButton.getText().toString();
+                    Transaksi transaksi = new Transaksi(cd, name, date,Integer.valueOf(changeStock), status);
+//                    System.out.println("Product Name: "+ transaksi.getName() + ", status =" + transaksi.getStatus()+"["+ transaksi.getCurrentStock() +"], Now Stock= "+ curStock);
+                    saveTransaksi(transaksi);
+                } else {
+                    Toast.makeText(getContext(), "Please Check Your Form!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void saveTransaksi(final Transaksi transaksi) {
+        firestore.collection("Users").document(auth.getUid()).collection("Transaksi")
+                .add(transaksi).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
+                if (task.isSuccessful()) {
+                    int curStock = Integer.valueOf(currentStock.getText().toString());
+                    if (transaksi.getStatus().equals("IN")) {
+                        curStock += transaksi.getCurrentStock();
+                    } else {
+                        curStock -= transaksi.getCurrentStock();
+                    }
+                    updateBarangStock(transaksi.getId(), curStock);
+                    Toast.makeText(getContext(), "Transaction Saved", Toast.LENGTH_SHORT).show();
+                } else {
+                    String message = task.getException().getMessage();
+                    Toast.makeText(getContext(), "Transaction Failed: " + message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void updateBarangStock(String code ,int stock) {
+        firestore.collection("Users").document(auth.getUid())
+                .collection("Barang").document(code).update("stock", stock)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Update Barang[Stock] Success: " + task.isSuccessful());
+                        } else {
+                            Log.d(TAG, "Failed update Barang[Stock]: " + task.getException().getMessage());
+                        }
+                    }
+                });
     }
 
     // TODO: Rename method, update argument and hook method into UI event

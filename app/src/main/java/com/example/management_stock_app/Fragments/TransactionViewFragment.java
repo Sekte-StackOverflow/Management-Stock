@@ -86,6 +86,7 @@ public class TransactionViewFragment extends Fragment {
                         for (DocumentSnapshot doc : task.getResult()) {
                             list.add(new Transaksi(
                                     doc.getId(),
+                                    doc.get("name").toString(),
                                     doc.get("tanggal").toString(),
                                     Integer.valueOf(doc.get("stock").toString()),
                                     doc.get("Status").toString()
