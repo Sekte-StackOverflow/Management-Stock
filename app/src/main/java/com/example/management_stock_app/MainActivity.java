@@ -22,9 +22,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.management_stock_app.Fragments.DetailProductFragment;
 import com.example.management_stock_app.Fragments.HomeFragment;
 import com.example.management_stock_app.Fragments.HomeFragment.OnFragmentInteractionListener;
 import com.example.management_stock_app.Fragments.LoginFragment;
+import com.example.management_stock_app.Fragments.LowStocksFragment;
 import com.example.management_stock_app.Fragments.ProductInFragment;
 import com.example.management_stock_app.Fragments.ProductOutFragment;
 import com.example.management_stock_app.Fragments.ProductsFragment;
@@ -57,7 +59,9 @@ public class MainActivity extends AppCompatActivity implements
         TransactionFragment.OnFragmentInteractionListener,
         BottomNavigationView.OnNavigationItemSelectedListener,
         TransactionChartFragment.OnFragmentInteractionListener,
-        TransactionViewFragment.OnFragmentInteractionListener
+        TransactionViewFragment.OnFragmentInteractionListener,
+        LowStocksFragment.OnFragmentInteractionListener,
+        DetailProductFragment.OnFragmentInteractionListener
         {
 
     private List<Barang> barangList = new ArrayList<>();
@@ -99,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
                         fragment = new ProductsFragment();
                         break;
                     case R.id.action_low_stock:
-                        fragment = new StocksFragment();
+                        fragment = new LowStocksFragment();
                         break;
                     case R.id.action_transaction:
                         fragment = new TransactionFragment();
@@ -144,9 +148,27 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void buttonInput() {
+    public void detailBarang(Barang barang) {
+        DetailProductFragment fragment = new DetailProductFragment();
+        fragment.setInformation(barang);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.flcontent, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
+    public void gotoProductIn() {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.flcontent, new ProductInFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
+    public void buttonInput() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.flcontent, new TransactionFragment())
                 .addToBackStack(null)
                 .commit();
     }

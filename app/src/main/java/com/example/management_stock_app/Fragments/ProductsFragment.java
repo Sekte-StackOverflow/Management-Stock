@@ -32,6 +32,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -60,15 +61,15 @@ public class ProductsFragment extends Fragment {
     private FirebaseUser firebaseUser;
     private FirebaseStorage storage;
 
-    private List<Barang> barangList = new ArrayList<>();
+    private List<Barang> barangList;
     private User userData;
     private ProductAdapter adapter;
     private String userEmail;
 
     private TextView testView;
-    private Button btnTest;
     private RecyclerView productsView;
     private ProgressBar spinner;
+    private FloatingActionButton btnAdd;
 
 
     public ProductsFragment() {
@@ -84,18 +85,23 @@ public class ProductsFragment extends Fragment {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         storage = FirebaseStorage.getInstance();
         userEmail = firebaseUser.getEmail();
-        //btnTest = view.findViewById(R.id.btn_test);
-        testView = view.findViewById(R.id.textView2);
+        barangList = new ArrayList<>();
+
         productsView = view.findViewById(R.id.rv_products);
         spinner = view.findViewById(R.id.progressProduct);
+        btnAdd = view.findViewById(R.id.add_new_product);
         spinner.setVisibility(View.GONE);
         productsView.setVisibility(View.GONE);
         getDatabase();
-        /*btnTest.setOnClickListener(new View.OnClickListener() {
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.gotoProductIn();
+                }
             }
-        });*/
+        });
 
         return view;
     }
@@ -171,10 +177,15 @@ public class ProductsFragment extends Fragment {
 
     private void adapterData(List<Barang> list) {
         adapter = new ProductAdapter(list);
-        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+        adapter.openLoadAnimation();
+        adapter.isFirstOnly(true);
+        adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                System.out.println("Position: "+position);
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                if (mListener != null) {
+                    Barang selected = barangList.get(position);
+                    mListener.detailBarang(selected);
+                }
             }
         });
         productsView.setAdapter(adapter);
@@ -202,6 +213,8 @@ public class ProductsFragment extends Fragment {
         void buttonProduct();
         void addNewProduct(User user);
         void setDataBarang(List<Barang> dataBarang, User user);
+        void detailBarang(Barang barang);
+        void gotoProductIn();
     }
 
 }

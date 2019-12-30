@@ -18,6 +18,7 @@ public class TransactionAdapter extends BaseQuickAdapter<Transaksi, BaseViewHold
     @Override
     protected void convert(@NonNull BaseViewHolder helper, Transaksi item) {
         helper.setText(R.id.trs_product_name, item.getId())
-                .setText(R.id.trs_date, item.getDate());
+                .setText(R.id.trs_date, item.getDate())
+                .setText(R.id.in_or_out, item.getStatus());
     }
 }

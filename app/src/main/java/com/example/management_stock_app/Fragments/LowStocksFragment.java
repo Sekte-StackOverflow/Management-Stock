@@ -1,6 +1,5 @@
 package com.example.management_stock_app.Fragments;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,18 +15,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.management_stock_app.Adapters.TransactionAdapter;
-import com.example.management_stock_app.Models.Transaksi;
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.example.management_stock_app.Adapters.LowStockAdapter;
+import com.example.management_stock_app.Models.Barang;
 import com.example.management_stock_app.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,23 +36,24 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link TransactionViewFragment.OnFragmentInteractionListener} interface
+ * {@link LowStocksFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class TransactionViewFragment extends Fragment {
-    private final String TAG = "TRANSACTION_VIEW_FRAGMENT";
+public class LowStocksFragment extends Fragment {
+    private final String TAG = "LOW_STOCK_FRAGMENT";
 
     private OnFragmentInteractionListener mListener;
     private FirebaseAuth auth;
     private FirebaseFirestore firestore;
-    private RecyclerView viewTransaksi;
-    private TextView noDataView;
-    private ProgressBar progressBar;
 
-    private List<Transaksi> list = new ArrayList<>();
-    private TransactionAdapter adapter;
+    private RecyclerView rvLowStocks;
+    private ProgressBar spinner;
 
-    public TransactionViewFragment() {
+    private List<Barang> lowStockList = new ArrayList<>();
+    private LowStockAdapter adapter;
+    private int stockMinimum = 25;
+
+    public LowStocksFragment() {
         // Required empty public constructor
     }
 
@@ -62,52 +64,69 @@ public class TransactionViewFragment extends Fragment {
         // Inflate the layout for this fragment
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
-        return inflater.inflate(R.layout.fragment_transaction_view, container, false);
+        return inflater.inflate(R.layout.fragment_low_stocks, container, false);
     }
 
     @Override
-    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewTransaksi = view.findViewById(R.id.rv_transaction);
-        noDataView = view.findViewById(R.id.text_empty_transaction);
-        progressBar = view.findViewById(R.id.transaction_progress);
+        rvLowStocks = view.findViewById(R.id.rv_lower_stock);
+        spinner = view.findViewById(R.id.stock_loading);
 
-        viewTransaksi.setVisibility(View.GONE);
-        noDataView.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
+        rvLowStocks.setVisibility(View.GONE);
+        spinner.setVisibility(View.GONE);
+        getLowerStock();
+    }
 
+    public void getLowerStock() {
+        spinner.setVisibility(View.VISIBLE);
         firestore.collection("Users").document(auth.getUid())
-                .collection("Transaksi").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @SuppressLint("LongLogTag")
+                .collection("Barang").whereLessThanOrEqualTo("stock", stockMinimum)
+                .orderBy("stock", Query.Direction.ASCENDING).limit(10)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     if (!task.getResult().isEmpty()) {
-                        for (DocumentSnapshot doc : task.getResult()) {
-                            list.add(new Transaksi(
-                                    doc.get("id").toString(),
-                                    doc.get("name").toString(),
-                                    doc.get("date").toString(),
-                                    Integer.valueOf(doc.get("currentStock").toString()),
-                                    doc.get("status").toString()
-                            ));
-                            adapter = new TransactionAdapter(list);
-                            viewTransaksi.setAdapter(adapter);
-                            viewTransaksi.setLayoutManager(new LinearLayoutManager(getContext()));
-                            progressBar.setVisibility(View.GONE);
-                            viewTransaksi.setVisibility(View.VISIBLE);
+                        for (DocumentSnapshot doc :
+                                task.getResult()) {
+                            Barang barang = new Barang(
+                                    doc.getId(),
+                                    doc.get("nama").toString(),
+                                    doc.get("gambar").toString(),
+                                    Integer.valueOf(doc.get("stock").toString()),
+                                    Integer.valueOf(doc.get("harga").toString())
+                            );
+                            lowStockList.add(barang);
                         }
+                        spinner.setVisibility(View.GONE);
+                        showList();
                     } else {
-                        progressBar.setVisibility(View.GONE);
-                        noDataView.setVisibility(View.VISIBLE);
-                        Toast.makeText(getContext(), "No Transaction", Toast.LENGTH_SHORT).show();
+                        spinner.setVisibility(View.GONE);
+                        Log.d(TAG, "Empty DataStore!");
                     }
                 } else {
-                    progressBar.setVisibility(View.GONE);
-                    Log.d(TAG, task.getException().getMessage());
+                    spinner.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Failed Get Data!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    public void showList() {
+        adapter = new LowStockAdapter(lowStockList);
+        adapter.openLoadAnimation();
+        adapter.isFirstOnly(true);
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Barang barang = lowStockList.get(position);
+                Toast.makeText(getContext(), "Name: " + barang.getNama(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        rvLowStocks.setAdapter(adapter);
+        rvLowStocks.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvLowStocks.setVisibility(View.VISIBLE);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -31,6 +31,7 @@ public class ProductAdapter extends BaseQuickAdapter<Barang, BaseViewHolder> {
         helper.setText(R.id.text_name, product.getNama())
                 .setText(R.id.text_code, product.getCode())
 //                .setText(R.id.product_stock, String.valueOf(product.getStock()))
-                .setText(R.id.text_price, String.valueOf(product.getHarga()));
+                .setText(R.id.text_price, String.valueOf(product.getHarga()))
+                .addOnClickListener(R.id.button_action);
     }
 }
