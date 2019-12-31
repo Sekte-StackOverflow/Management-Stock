@@ -9,20 +9,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.example.management_stock_app.Models.Barang;
-import com.example.management_stock_app.Models.Transaksi;
 import com.example.management_stock_app.R;
-import com.example.management_stock_app.ViewModels.TransactionViewModel;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -35,7 +30,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -50,7 +44,6 @@ public class TransactionChartFragment extends Fragment {
     private int hand, in, out;
     private PieChart chart;
     private List<PieEntry> data;
-    private TransactionViewModel transactionViewModel;
 
     private FirebaseFirestore firestore;
     private FirebaseAuth auth;
@@ -66,7 +59,6 @@ public class TransactionChartFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        transactionViewModel = ViewModelProviders.of(requireActivity()).get(TransactionViewModel.class);
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         hand = 0;
@@ -82,27 +74,6 @@ public class TransactionChartFragment extends Fragment {
         getTransaction();
         getBarangStock();
         updateChart();
-        transactionViewModel.getHand().observe(requireActivity(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                hand = integer;
-                updateChart();
-            }
-        });
-        transactionViewModel.getIn().observe(requireActivity(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                in = integer;
-                updateChart();
-            }
-        });
-        transactionViewModel.getOut().observe(requireActivity(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                out = integer;
-                updateChart();
-            }
-        });
     }
 
     private void updateChart() {
@@ -139,8 +110,8 @@ public class TransactionChartFragment extends Fragment {
                                 tmpOut += stk;
                             }
                         }
-                        transactionViewModel.setIn(tmpIn);
-                        transactionViewModel.setOut(tmpOut);
+                        in = tmpIn;
+                        out = tmpOut;
                     } else {
                         Log.d(TAG, "Empty data");
                     }
@@ -165,7 +136,7 @@ public class TransactionChartFragment extends Fragment {
                             int stock = Integer.valueOf(document.get("stock").toString());
                              tmp += stock;
                         }
-                        transactionViewModel.setHand(tmp);
+                        hand = tmp;
                     } else {
                         Toast.makeText(getContext(), "Data is Empty", Toast.LENGTH_SHORT).show();
                     }
