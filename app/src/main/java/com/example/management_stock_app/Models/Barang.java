@@ -37,4 +37,24 @@ public class Barang {
     public String getGambar() {
         return gambar;
     }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
+    public void setHarga(int harga) {
+        this.harga = harga;
+    }
+
+    public void setGambar(String gambar) {
+        this.gambar = gambar;
+    }
 }

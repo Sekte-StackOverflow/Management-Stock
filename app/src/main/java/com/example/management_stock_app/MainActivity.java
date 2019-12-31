@@ -1,20 +1,8 @@
 package com.example.management_stock_app;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,10 +10,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.management_stock_app.Fragments.AllTransactionRecordFragment;
 import com.example.management_stock_app.Fragments.DetailProductFragment;
 import com.example.management_stock_app.Fragments.HomeFragment;
-import com.example.management_stock_app.Fragments.HomeFragment.OnFragmentInteractionListener;
-import com.example.management_stock_app.Fragments.LoginFragment;
 import com.example.management_stock_app.Fragments.LowStocksFragment;
 import com.example.management_stock_app.Fragments.ProductInFragment;
 import com.example.management_stock_app.Fragments.ProductOutFragment;
@@ -39,14 +26,9 @@ import com.example.management_stock_app.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +43,8 @@ public class MainActivity extends AppCompatActivity implements
         TransactionChartFragment.OnFragmentInteractionListener,
         TransactionViewFragment.OnFragmentInteractionListener,
         LowStocksFragment.OnFragmentInteractionListener,
-        DetailProductFragment.OnFragmentInteractionListener
+        DetailProductFragment.OnFragmentInteractionListener,
+        AllTransactionRecordFragment.OnFragmentInteractionListener
         {
 
     private List<Barang> barangList = new ArrayList<>();
@@ -106,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements
                         fragment = new LowStocksFragment();
                         break;
                     case R.id.action_transaction:
-                        fragment = new TransactionFragment();
+                        fragment = new AllTransactionRecordFragment();
                         break;
                 }
                 return loadFragment(fragment);

@@ -2,13 +2,10 @@ package com.example.management_stock_app.Fragments;
 
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,21 +13,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
-import com.chad.library.adapter.base.listener.OnItemSwipeListener;
 import com.example.management_stock_app.Adapters.ProductAdapter;
 import com.example.management_stock_app.Models.Barang;
 import com.example.management_stock_app.Models.User;
 import com.example.management_stock_app.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,17 +33,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,6 +60,7 @@ public class ProductsFragment extends Fragment {
     private RecyclerView productsView;
     private ProgressBar spinner;
     private FloatingActionButton btnAdd;
+    private SearchView searchView;
 
 
     public ProductsFragment() {
@@ -87,12 +78,40 @@ public class ProductsFragment extends Fragment {
         userEmail = firebaseUser.getEmail();
         barangList = new ArrayList<>();
 
+        searchView = view.findViewById(R.id.search_box);
         productsView = view.findViewById(R.id.rv_products);
         spinner = view.findViewById(R.id.progressProduct);
         btnAdd = view.findViewById(R.id.add_new_product);
         spinner.setVisibility(View.GONE);
         productsView.setVisibility(View.GONE);
+
         getDatabase();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                List<Barang> tmp = new ArrayList<>();
+                tmp.clear();
+                String text = newText.toLowerCase(Locale.getDefault());
+                if (text.length() == 0) {
+                    adapterData(barangList);
+                } else {
+                    for (Barang brg :
+                            barangList) {
+                        if (brg.getNama().toLowerCase(Locale.getDefault()).contains(text)) {
+                            tmp.add(brg);
+                        }
+                    }
+                    adapterData(tmp);
+                }
+                return false;
+            }
+        });
 
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,7 +144,8 @@ public class ProductsFragment extends Fragment {
     }
     private void getSubCollection(User user) {
         firestore.collection("Users").document(user.getId())
-                .collection("Barang").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .collection("Barang").orderBy("nama", Query.Direction.ASCENDING)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {

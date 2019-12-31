@@ -47,14 +47,13 @@ import java.util.List;
 public class TransactionChartFragment extends Fragment {
     private final String TAG = "TRANSACTION_CHART";
 
-    private int hand=0, in=0, out=0;
+    private int hand, in, out;
     private PieChart chart;
     private List<PieEntry> data;
     private TransactionViewModel transactionViewModel;
-    private List<Barang> barangList = new ArrayList<>();
-    private List<Transaksi> transaksi = new ArrayList<>();
 
     private FirebaseFirestore firestore;
+    private FirebaseAuth auth;
 
     private OnFragmentInteractionListener mListener;
 
@@ -69,6 +68,10 @@ public class TransactionChartFragment extends Fragment {
         // Inflate the layout for this fragment
         transactionViewModel = ViewModelProviders.of(requireActivity()).get(TransactionViewModel.class);
         firestore = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
+        hand = 0;
+        out = 0;
+        in = 0;
         return inflater.inflate(R.layout.fragment_transaction_chart, container, false);
     }
 
@@ -76,15 +79,14 @@ public class TransactionChartFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         chart = view.findViewById(R.id.stock_pie_chart);
-        fakeBarang();
-        fakeTransaction();
+        getTransaction();
+        getBarangStock();
         updateChart();
         transactionViewModel.getHand().observe(requireActivity(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 hand = integer;
                 updateChart();
-                System.out.println("Hand Update : in Observe");
             }
         });
         transactionViewModel.getIn().observe(requireActivity(), new Observer<Integer>() {
@@ -101,8 +103,6 @@ public class TransactionChartFragment extends Fragment {
                 updateChart();
             }
         });
-        addFakeData(new Transaksi("1232", "", "22-12-2019", 15, "IN"));
-        addFakeData(new Transaksi("2211", "", "22-12-2019", 30, "OUT"));
     }
 
     private void updateChart() {
@@ -120,52 +120,37 @@ public class TransactionChartFragment extends Fragment {
         chart.invalidate();
     }
 
-    private void fakeBarang() {
-        barangList.add(new Barang("123", "Barang 1", "1123", 10, 2000));
-        barangList.add(new Barang("111", "Barang 2", "1123", 10, 8000));
-        barangList.add(new Barang("222", "Barang 3", "1123", 10, 9000));
-        barangList.add(new Barang("333", "Barang 4", "1123", 10, 5000));
-        int tmp = 0;
-        for (Barang item : barangList) {
-            tmp += item.getStock();
-        }
-        hand = tmp;
-        updateChart();
-    }
-
-    private void fakeTransaction() {
-        Date date = new Date();
-        transaksi.add(new Transaksi("ID-01", "",date.toString(), 20, "IN"));
-        transaksi.add(new Transaksi("ID-02", "",date.toString(), 5, "OUT"));
-        transaksi.add(new Transaksi("ID-03", "",date.toString(), 20, "IN"));
-        transaksi.add(new Transaksi("ID-04", "",date.toString(), 10, "OUT"));
-        for (Transaksi item :
-                transaksi) {
-            if (item.getStatus().equals("IN")) {
-                in += item.getCurrentStock();
-            } else {
-                out += item.getCurrentStock();
+    private void getTransaction() {
+        firestore.collection("Users").document(auth.getUid())
+                .collection("Transaksi")
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    if (task.getResult().isEmpty()) {
+                        int tmpIn =0, tmpOut=0;
+                        for (DocumentSnapshot doc : task.getResult()) {
+                            String stat = doc.get("status").toString();
+                            if (stat.equals("IN")) {
+                                int stk = Integer.valueOf(doc.get("currentStock").toString());
+                                tmpIn += stk;
+                            } else {
+                                int stk = Integer.valueOf(doc.get("currentStock").toString());
+                                tmpOut += stk;
+                            }
+                        }
+                        transactionViewModel.setIn(tmpIn);
+                        transactionViewModel.setOut(tmpOut);
+                    } else {
+                        Log.d(TAG, "Empty data");
+                    }
+                } else {
+                    Log.d(TAG, "Connection Failed");
+                }
             }
-        }
-        hand -= out;
-        hand += in;
-        updateChart();
+        });
     }
 
-    private void addFakeData(Transaksi transaksi) {
-        this.transaksi.add(transaksi);
-        if (transaksi.getStatus().equals("IN")) {
-            hand += transaksi.getCurrentStock();
-            in += transaksi.getCurrentStock();
-        } else {
-            hand -= transaksi.getCurrentStock();
-            out += transaksi.getCurrentStock();
-        }
-        transactionViewModel.setHand(hand);
-        transactionViewModel.setIn(in);
-        transactionViewModel.setOut(out);
-        updateChart();
-    }
 
     private void getBarangStock() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -175,16 +160,12 @@ public class TransactionChartFragment extends Fragment {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     if (!task.getResult().isEmpty()) {
+                        int tmp = 0;
                         for (DocumentSnapshot document : task.getResult()) {
-                            Barang barang = new Barang(document.getId(),
-                                    document.get("nama").toString(),
-                                    document.get("gambar").toString(),
-                                    Integer.valueOf(document.get("stock").toString()),
-                                    Integer.valueOf(document.get("harga").toString())
-                            );
-                            barangList.add(barang);
-                            transactionViewModel.setHand( hand + barang.getStock());
+                            int stock = Integer.valueOf(document.get("stock").toString());
+                             tmp += stock;
                         }
+                        transactionViewModel.setHand(tmp);
                     } else {
                         Toast.makeText(getContext(), "Data is Empty", Toast.LENGTH_SHORT).show();
                     }

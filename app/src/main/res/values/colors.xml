@@ -14,4 +14,8 @@
     <color name="rally_yellow">#FFCF44</color>
     <color name="rally_purple">#B15DFF</color>
     <color name="rally_blue">#72DEFF</color>
+
+<!--    status color-->
+    <color name="myGreen">#00b8a9</color>
+    <color name="myRed">#f6416c</color>
 </resources>

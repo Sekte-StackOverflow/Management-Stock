@@ -1,7 +1,9 @@
 package com.example.management_stock_app.Fragments;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -111,7 +113,6 @@ public class DetailProductFragment extends Fragment {
             stock.setText(String.valueOf(barang.getStock()));
             Picasso.get().load(barang.getGambar()).into(image);
         }
-
         change.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,6 +124,36 @@ public class DetailProductFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 choosePicture();
+            }
+        });
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String nm = name.getText().toString();
+                String pr = price.getText().toString();
+                if (!nm.equals("") && !pr.equals("")) {
+                    if (Integer.parseInt(pr) > 0) {
+                        barang.setNama(nm);
+                        barang.setHarga(Integer.valueOf(pr));
+                        //delete first
+                        deleteImage(barang.getGambar());
+                        // then upload
+                        uploadImage();
+                    } else {
+                        Toast.makeText(getContext(), "Price must greater than 0 (zero)", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Please Check your form!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (barang != null) {
+                    deleteDialog();
+                }
             }
         });
 
@@ -137,6 +168,43 @@ public class DetailProductFragment extends Fragment {
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    private void deleteDialog() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+        alert.setTitle("Warning !");
+        alert.setMessage("Are you sure want to delete this product, note: delete product couldn't the transaction history!")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteImage(barang.getGambar());
+                        deleteData();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alertDialog = alert.create();
+        alertDialog.show();
+    }
+
+    private void deleteData() {
+        firestore.collection("Users").document(auth.getUid())
+                .collection("Barang").document(barang.getCode())
+                .delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(getContext(), "Delete Success full!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Delete Failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void deleteImage(String imageUrl) {
@@ -195,13 +263,13 @@ public class DetailProductFragment extends Fragment {
         data.put("gambar", urlString);
         data.put("stock", barang.getStock());
         data.put("harga", barang.getHarga());
-
         firestore.collection("Users").document(auth.getUid())
                 .collection("Barang").document(barang.getCode())
                 .set(data, SetOptions.merge()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
+                    progressDialog.dismiss();
                     Toast.makeText(getContext(), "Data Changes Saved!", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getContext(), "Failed to save data!", Toast.LENGTH_SHORT).show();
