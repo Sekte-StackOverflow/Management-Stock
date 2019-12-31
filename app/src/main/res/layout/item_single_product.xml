@@ -62,7 +62,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:layout_marginStart="280dp"
+            android:layout_marginStart="270dp"
+            android:background="@android:color/white"
+            android:drawableLeft="@drawable/edit"
             android:text="Set" />
 
     </androidx.cardview.widget.CardView>

@@ -128,7 +128,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:text="Save"
+        android:background="@android:color/white"
+        android:drawableLeft="@drawable/save"
+        android:text=" Save"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.384"
@@ -179,7 +181,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="92dp"
         android:layout_marginBottom="24dp"
-        android:text="Cancel"
+        android:background="@android:color/white"
+        android:drawableLeft="@drawable/cancel"
+        android:text=" Cancel"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintStart_toStartOf="parent" />
 
