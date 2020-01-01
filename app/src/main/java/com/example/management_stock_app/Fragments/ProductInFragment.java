@@ -1,14 +1,18 @@
 package com.example.management_stock_app.Fragments;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -56,12 +60,14 @@ import static android.app.Activity.RESULT_OK;
  */
 public class ProductInFragment extends Fragment {
     private final int PICK_IMAGE_REQUEST = 71;
+    private final int CAMERA_REQUEST = 1888;
+    private static final int MY_CAMERA_PERMISSION_CODE = 100;
     private final String TAG = "PRODUCT_IN_FRAGMENT";
 
     private OnFragmentInteractionListener mListener;
     private EditText name, stock, price, code;
     private ImageView display;
-    private Button btnSave, btnChoose;
+    private Button btnSave, btnChoose, btnCamera;
     private ProgressDialog progressDialog;
 
     private Uri filepath;
@@ -89,6 +95,7 @@ public class ProductInFragment extends Fragment {
         display = view.findViewById(R.id.product_display);
         btnChoose = view.findViewById(R.id.btn_choose_pic);
         btnSave = view.findViewById(R.id.btn_save_product);
+        btnCamera = view.findViewById(R.id.btn_from_camera);
         progressDialog = new ProgressDialog(getContext());
 
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -113,6 +120,13 @@ public class ProductInFragment extends Fragment {
                 uploadNewBarang();
             }
         });
+        btnCamera.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View v) {
+                fromCamera();
+            }
+        });
     }
     // TODO: Rename method, update argument and hook method into UI event
     private void choosePicture() {
@@ -120,6 +134,16 @@ public class ProductInFragment extends Fragment {
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void fromCamera() {
+        if (getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
+        } else {
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, CAMERA_REQUEST);
+        }
     }
 
     private void uploadNewBarang() {
@@ -201,6 +225,24 @@ public class ProductInFragment extends Fragment {
                 display.setImageBitmap(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        } else if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK ) {
+            filepath = data.getData();
+            bitmap = ((Bitmap) data.getExtras().get("data"));
+            display.setImageBitmap(bitmap);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_CAMERA_PERMISSION_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getActivity(), "camera permission granted", Toast.LENGTH_LONG).show();
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            } else {
+                Toast.makeText(getActivity(), "camera permission denied", Toast.LENGTH_LONG).show();
             }
         }
     }

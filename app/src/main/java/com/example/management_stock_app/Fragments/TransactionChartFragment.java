@@ -15,13 +15,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.anychart.AnyChart;
+import com.anychart.AnyChartView;
+import com.anychart.chart.common.dataentry.DataEntry;
+import com.anychart.chart.common.dataentry.ValueDataEntry;
+import com.anychart.chart.common.listener.Event;
+import com.anychart.chart.common.listener.ListenersInterface;
+import com.anychart.charts.Pie;
+import com.anychart.enums.Align;
+import com.anychart.enums.LegendLayout;
+
 import com.example.management_stock_app.R;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,8 +49,12 @@ public class TransactionChartFragment extends Fragment {
     private final String TAG = "TRANSACTION_CHART";
 
     private int hand, in, out;
-    private PieChart chart;
-    private List<PieEntry> data;
+//    private PieChart chart;
+//    private List<PieEntry> data;
+
+    private AnyChartView anyChartView;
+    private Pie pie;
+    private ProgressBar spinner;
 
     private FirebaseFirestore firestore;
     private FirebaseAuth auth;
@@ -70,26 +81,58 @@ public class TransactionChartFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        chart = view.findViewById(R.id.stock_pie_chart);
-        getTransaction();
+//        chart = view.findViewById(R.id.stock_pie_chart);
+        anyChartView = view.findViewById(R.id.pieChart);
+        spinner = view.findViewById(R.id.progressBar4);
+        anyChartView.setVisibility(View.GONE);
+        spinner.setVisibility(View.VISIBLE);
         getBarangStock();
-        updateChart();
     }
 
-    private void updateChart() {
-        data = new ArrayList<>();
-        int[] color = new int[]{Color.GRAY, Color.CYAN, Color.MAGENTA};
-        data.add(new PieEntry(hand, "Hand"));
-        data.add(new PieEntry(in, "Incoming"));
-        data.add(new PieEntry(out, "Outcome"));
-        PieDataSet pieDataSet = new PieDataSet(data, "");
-        pieDataSet.setColors(color);
-        PieData pieData = new PieData(pieDataSet);
-        chart.setDrawEntryLabels(false);
-        chart.setDrawHoleEnabled(false);
-        chart.setData(pieData);
-        chart.invalidate();
+    private void chart() {
+        spinner.setVisibility(View.GONE);
+        pie = AnyChart.pie();
+        pie.setOnClickListener(new ListenersInterface.OnClickListener() {
+            @Override
+            public void onClick(Event event) {
+                Toast.makeText(getContext(), event.getData().get("x"), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        List<DataEntry> data = new ArrayList<>();
+        data.add(new ValueDataEntry("hand", hand));
+        data.add(new ValueDataEntry("in", in));
+        data.add(new ValueDataEntry("out", out));
+
+        pie.data(data);
+        pie.title("Stock Pie Chart");
+        pie.labels().position("outside");
+
+        pie.legend().title().enabled(true);
+        pie.legend().title().text("Description");
+//                .padding(0d, 0d, 10d, 0d);
+        pie.legend()
+                .position("right")
+                .itemsLayout(LegendLayout.VERTICAL_EXPANDABLE)
+                .align(Align.CENTER);
+        anyChartView.setChart(pie);
+        anyChartView.setVisibility(View.VISIBLE);
     }
+
+//    private void updateChart() {
+//        data = new ArrayList<>();
+//        int[] color = new int[]{Color.GRAY, Color.CYAN, Color.MAGENTA};
+//        data.add(new PieEntry(hand, "Hand"));
+//        data.add(new PieEntry(in, "Incoming"));
+//        data.add(new PieEntry(out, "Outcome"));
+//        PieDataSet pieDataSet = new PieDataSet(data, "");
+//        pieDataSet.setColors(color);
+//        PieData pieData = new PieData(pieDataSet);
+//        chart.setDrawEntryLabels(false);
+//        chart.setDrawHoleEnabled(false);
+//        chart.setData(pieData);
+//        chart.invalidate();
+//    }
 
     private void getTransaction() {
         firestore.collection("Users").document(auth.getUid())
@@ -98,7 +141,7 @@ public class TransactionChartFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    if (task.getResult().isEmpty()) {
+                    if (!task.getResult().isEmpty()) {
                         int tmpIn =0, tmpOut=0;
                         for (DocumentSnapshot doc : task.getResult()) {
                             String stat = doc.get("status").toString();
@@ -112,6 +155,7 @@ public class TransactionChartFragment extends Fragment {
                         }
                         in = tmpIn;
                         out = tmpOut;
+                        chart();
                     } else {
                         Log.d(TAG, "Empty data");
                     }
@@ -137,6 +181,7 @@ public class TransactionChartFragment extends Fragment {
                              tmp += stock;
                         }
                         hand = tmp;
+                        getTransaction();
                     } else {
                         Toast.makeText(getContext(), "Data is Empty", Toast.LENGTH_SHORT).show();
                     }
